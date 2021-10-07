@@ -256,17 +256,6 @@ static int proc_dointvec_minmax_bpf_enable(struct ctl_table *table, int write,
 }
 
 static int
-proc_dointvec_minmax_bpf_restricted(struct ctl_table *table, int write,
-				    void __user *buffer, size_t *lenp,
-				    loff_t *ppos)
-{
-	if (!capable(CAP_SYS_ADMIN))
-		return -EPERM;
-
-	return proc_dointvec_minmax(table, write, buffer, lenp, ppos);
-}
-
-static int
 proc_dolongvec_minmax_bpf_restricted(struct ctl_table *table, int write,
 				     void __user *buffer, size_t *lenp,
 				     loff_t *ppos)
@@ -275,6 +264,19 @@ proc_dolongvec_minmax_bpf_restricted(struct ctl_table *table, int write,
 		return -EPERM;
 
 	return proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
+}
+#endif
+
+# ifdef CONFIG_HAVE_EBPF_JIT
+static int
+proc_dointvec_minmax_bpf_restricted(struct ctl_table *table, int write,
+				    void __user *buffer, size_t *lenp,
+				    loff_t *ppos)
+{
+	if (!capable(CAP_SYS_ADMIN))
+		return -EPERM;
+
+	return proc_dointvec_minmax(table, write, buffer, lenp, ppos);
 }
 #endif
 
